@@ -11,7 +11,7 @@ The procedure of submission is as following:
 
 ## Deadline
 
-Sumbit your work before **2016/5/24 (Tue.) 23:59:59**.
+Sumbit your work before **2016/5/26 (Thr.) 23:59:59**.
 
 Late submissions **WILL NOT** be accepted.
 
