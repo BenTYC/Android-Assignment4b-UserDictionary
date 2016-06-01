@@ -15,9 +15,12 @@
  */
 package com.example.android.sunshine.app;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.UserDictionary;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
@@ -33,21 +36,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
 
 
-public class DetailActivity extends ActionBarActivity {
 
+public class DetailActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new DetailFragment())
                     .commit();
         }
+
     }
 
     @Override
@@ -164,7 +170,9 @@ public class DetailActivity extends ActionBarActivity {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             Log.v(LOG_TAG, "In onLoadFinished");
-            if (!data.moveToFirst()) { return; }
+            if (!data.moveToFirst()) {
+                return;
+            }
 
             String dateString = Utility.formatDate(
                     data.getLong(COL_WEATHER_DATE));
@@ -182,16 +190,47 @@ public class DetailActivity extends ActionBarActivity {
 
             mForecast = String.format("%s - %s - %s/%s", dateString, weatherDescription, high, low);
 
-            TextView detailTextView = (TextView)getView().findViewById(R.id.detail_text);
+            TextView detailTextView = (TextView) getView().findViewById(R.id.detail_text);
             detailTextView.setText(mForecast);
 
             // If onCreateOptionsMenu has already happened, we need to update the share intent now.
             if (mShareActionProvider != null) {
                 mShareActionProvider.setShareIntent(createShareForecastIntent());
             }
+
+            //作業部份
+
+            TextView detailText = (TextView) getView().findViewById(R.id.detail_text);
+            detailText.setOnLongClickListener(new View.OnLongClickListener() {
+
+                @Override
+                public boolean onLongClick(View view) {
+                    TextView textView = (TextView) view;
+                    String word = textView.getText().toString();
+
+                    ContentValues mNewValues = new ContentValues();
+
+                    mNewValues.put(UserDictionary.Words.APP_ID, "example.sunshine");
+                    mNewValues.put(UserDictionary.Words.LOCALE, "en_US");
+                    mNewValues.put(UserDictionary.Words.WORD, word);
+                    mNewValues.put(UserDictionary.Words.FREQUENCY, "1");
+
+                    Toast.makeText(view.getContext(), word + "存入字典", Toast.LENGTH_LONG).show();
+
+                    getActivity().getApplicationContext().getContentResolver().insert(
+                            UserDictionary.Words.CONTENT_URI,   // the user dictionary content URI
+                            mNewValues                          // the values to insert
+                    );
+
+                    return true;
+                }
+            });
+
         }
 
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) { }
+                @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+        }
+
     }
 }

@@ -1,12 +1,16 @@
 package com.example.android.sunshine.app;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
+import android.provider.UserDictionary;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts
@@ -60,5 +64,7 @@ public class ForecastAdapter extends CursorAdapter {
 
         TextView tv = (TextView)view;
         tv.setText(convertCursorRowToUXFormat(cursor));
+
+
     }
 }
